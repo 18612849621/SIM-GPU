@@ -13,7 +13,7 @@
 | Cocotb | Python 驱动的硬件测试框架 |
 | GNU Make | 统一的构建与测试入口 |
 
-当前机器已检测到 Python `3.11.2` 和 GNU Make；尚未安装 `iverilog`。
+当前机器已配置 Python `3.11.2`、GNU Make 和 Icarus Verilog `13.0`。
 
 ## 首次配置
 
@@ -61,34 +61,37 @@ source .venv/bin/activate
 deactivate
 ```
 
-## 验证环境
+## 运行测试
 
-完成阶段 0 后，项目会提供统一的测试命令：
+激活虚拟环境后，运行全部硬件测试：
 
 ```bash
+source .venv/bin/activate
 make test
 ```
 
-当前仓库处于项目骨架阶段，`Makefile` 和测试尚未创建；在此之前，可用下面命令确认基础工具：
+当前测试包括：
 
-```bash
-python3 --version
-iverilog -V
-make --version
-```
+- `gpu_top` 的同步复位与顶层 PC 接线测试；
+- 独立 `pc` 模块的复位、保持和逐拍递增测试。
 
-## 目录规划
+## 当前目录
 
 ```text
 SIM-GPU/
-├── CLAUDE.md        # 分阶段开发计划与协作约束
-├── README.md        # 项目说明与本地环境配置
-├── src/             # SystemVerilog RTL（阶段 0 创建）
-├── test/            # Cocotb/Python 测试（阶段 0 创建）
-├── Makefile         # 构建与仿真入口（阶段 0 创建）
-└── .venv/           # 本地 Python 虚拟环境，不提交到 Git
+├── CLAUDE.md              # 分阶段开发计划与协作约束
+├── README.md              # 项目说明与本地环境配置
+├── Makefile               # 构建与仿真入口
+├── src/
+│   ├── gpu_top.sv         # 顶层模块
+│   └── pc.sv              # 32 位程序计数器
+├── test/
+│   ├── test_reset.py      # 顶层复位/接线测试
+│   └── test_pc.py         # PC 模块测试
+├── docs/                  # 学习笔记
+└── .venv/                 # 本地 Python 虚拟环境，不提交到 Git
 ```
 
-## 下一步
+## 当前进度
 
-按 [`CLAUDE.md`](CLAUDE.md) 的阶段 0 创建最小顶层模块、时钟/复位测试和 `Makefile`，使 `make test` 成为第一个可重复通过的检查。
+阶段 0 的仿真骨架已经完成。当前处于阶段 1：实现最小单线程处理器的基础状态；第一个模块是 32 位 PC。下一小步是实现通用寄存器文件。
