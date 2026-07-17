@@ -72,13 +72,17 @@ make test
 
 当前测试包括：
 
-- `gpu_top` 的同步复位与顶层 PC 接线测试；
-- 独立 `pc` 模块的复位、保持和逐拍递增测试。
+- `gpu_top` 的同步复位与最小控制器状态测试；
+- 独立 `pc` 模块的复位、保持与受控加载测试；
+- 独立 `regfile` 模块的同步复位、禁写保持、单地址写入、双端口读取与读写同址测试；
+- `CONST; CONST; HALT` 程序的取指、写回、符号扩展与停机测试。
 
 ## 学习文档与时序图
 
 - [阶段 0：最小 RTL、时钟与复位](docs/phase-0-basics.md)
 - [阶段 1.1：Program Counter（PC）](docs/phase-1-pc.md)
+- [阶段 1.2：8×32 位通用寄存器文件](docs/phase-1-register-file.md)
+- [阶段 1.3：第一个程序执行闭环](docs/phase-1-const-halt.md)
 
 文档中的时序图统一将逻辑高、低电平画在不同高度；同一列的竖线代表同一时刻，时钟上升沿与寄存器状态变化按列对齐。
 
@@ -93,19 +97,24 @@ clk = 0  ────────┘    └─────┘    └──
 
 ```text
 SIM-GPU/
-├── CLAUDE.md              # 分阶段开发计划与协作约束
-├── README.md              # 项目说明与本地环境配置
-├── Makefile               # 构建与仿真入口
+├── CLAUDE.md                      # 分阶段开发计划与协作约束
+├── README.md                      # 项目说明与本地环境配置
+├── Makefile                       # 构建与仿真入口
 ├── src/
-│   ├── gpu_top.sv         # 顶层模块
-│   └── pc.sv              # 32 位程序计数器
+│   ├── gpu_top.sv                 # 顶层模块
+│   ├── pc.sv                      # 受控加载的 32 位程序计数器
+│   ├── regfile.sv                 # 8×32 位通用寄存器文件
+│   └── instruction_rom.sv         # 只读 16 位指令存储器
 ├── test/
-│   ├── test_reset.py      # 顶层复位/接线测试
-│   └── test_pc.py         # PC 模块测试
-├── docs/                  # 学习笔记
-└── .venv/                 # 本地 Python 虚拟环境，不提交到 Git
+│   ├── programs/const_halt.hex    # 首个测试程序的机器码
+│   ├── test_reset.py              # 顶层复位/控制器测试
+│   ├── test_pc.py                 # PC 模块测试
+│   ├── test_regfile.py            # 寄存器文件模块测试
+│   └── test_const_halt.py         # CONST/HALT 程序测试
+├── docs/                          # 学习笔记
+└── .venv/                         # 本地 Python 虚拟环境，不提交到 Git
 ```
 
 ## 当前进度
 
-阶段 0 的仿真骨架已经完成。当前处于阶段 1：实现最小单线程处理器的基础状态；第一个模块是 32 位 PC。下一小步是实现通用寄存器文件。
+阶段 0 的仿真骨架已经完成。当前处于阶段 1：PC、寄存器文件，以及 `CONST`/`HALT` 的取指、译码和写回闭环均已完成并测试。下一小步是独立定义并实现 32 位 ADD ALU。
